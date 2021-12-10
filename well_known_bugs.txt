@@ -1,0 +1,5 @@
+1) When application crashed suddenly, encryption fails to encrypt stored password file.  Restart the app with
+correct master password entered will fix the problem.
+
+2) Unwanted extra quotation marks keep adding to text such as login info and password and so forth when editing
+the login without completely entering new information.
