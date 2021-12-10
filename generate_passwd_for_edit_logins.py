@@ -5,6 +5,7 @@ import random as r
 from tkinter import messagebox
 import edit_logins
 import pandas as pd
+import pyperclip
 
 MAIN_BG = '#05132b'
 MAIN_TEXT = '#2ce5e8'
@@ -88,6 +89,7 @@ class GeneratePasswd(Tk):
         new_edit_logins = edit_logins.EditLoginsUi()
         new_passwd = self.hard_to_guess_gen_passwd
         new_edit_logins.password_entry_box_txt.set(new_passwd)
+        pyperclip.copy(self.hard_to_guess_gen_passwd)
         if os.path.exists('logins_data.csv'):
             new_data = pd.read_csv('logins_data.csv', names=['Logins', 'Email or Username', 'Password'])
             df = pd.DataFrame(new_data)

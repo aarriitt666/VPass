@@ -1,14 +1,13 @@
 import csv
 import os.path
-from csv import *
 from tkinter import *
+from csv import *
 from tkinter import messagebox
-
-import create_master_passwd_ui
-import encrypting
-import generate_passwd
-import get_hash
 from password_notebook_ui import PasswordNotebook
+import generate_passwd
+import create_master_passwd_ui
+import get_hash
+import encrypting
 
 MAIN_BG = '#05132b'
 MAIN_TEXT = '#2ce5e8'
@@ -61,14 +60,13 @@ class UserInterface(Tk):
         # Grid the widgets
         self.title_bar.grid(ipady=0, ipadx=0, column=0, row=0, rowspan=16, columnspan=23, sticky=N)
         self.close_button.grid(columnspan=23, padx=840, ipady=2, ipadx=7, column=2, row=0, sticky=E)
-        self.minimize_button.grid(columnspan=23, padx=810, ipady=2,
-                                  ipadx=7, column=1, row=0, sticky=E)
+        self.minimize_button.grid(columnspan=23, padx=810, ipady=2, ipadx=7, column=1, row=0, sticky=E)
         # Bind title bar motion to the move window function
         self.title_bar.bind('<B1-Motion>', self.move_window)
         # Canvas
         self.canvas = Canvas(width=500, height=250)
         self.canvas.grid(sticky=W, row=0, column=0, rowspan=16, columnspan=4, padx=0)
-        self.logo_img = PhotoImage(file='logo_custom.png')
+        self.logo_img = PhotoImage(file='C:/Users/argda/PycharmProjects/password-manager/logo_custom.png')
         self.canvas.create_image(300, 120, image=self.logo_img)
         self.canvas.config(bg=MAIN_BG, highlightthickness=0)
         # Password Notebook Button
@@ -77,14 +75,12 @@ class UserInterface(Tk):
                                                font=BUTTON_FONT, highlightthickness=3, bd=0,
                                                bg='#05132b', activebackground=BUTTON_ACTIVE_BG, fg=BUTTON_FG,
                                                activeforeground=BUTTON_ACTIVE_FG, command=self.open_password_notebook)
-        self.password_notebook_button.grid(
-            sticky=W, row=2, rowspan=10, column=1, columnspan=23, pady=0, padx=0)
+        self.password_notebook_button.grid(sticky=W, row=2, rowspan=10, column=1, columnspan=23, pady=0, padx=0)
         password_notebook_button_txt.set('Password Notebook')
         # Menu font seperator
         self.menu_font_seperator = Label(text='|', bg=MAIN_BG, font=MAIN_FONT, fg=MAIN_TEXT,
                                          highlightthickness=0)
-        self.menu_font_seperator.grid(sticky=W, row=2, column=2,
-                                      rowspan=10, columnspan=23, pady=0, padx=120)
+        self.menu_font_seperator.grid(sticky=W, row=2, column=2, rowspan=10, columnspan=23, pady=0, padx=120)
         # Add/Change Master Password Button
         add_change_master_passwd_button_txt = StringVar()
         self.add_change_master_passwd_button = Button(textvariable=add_change_master_passwd_button_txt, width=27,
@@ -92,8 +88,7 @@ class UserInterface(Tk):
                                                       bg='#05132b', activebackground=BUTTON_ACTIVE_BG, fg=BUTTON_FG,
                                                       activeforeground=BUTTON_ACTIVE_FG,
                                                       command=self.open_create_master_passwd_ui)
-        self.add_change_master_passwd_button.grid(
-            sticky=W, row=2, column=3, rowspan=10, columnspan=23, pady=0, padx=70)
+        self.add_change_master_passwd_button.grid(sticky=W, row=2, column=3, rowspan=10, columnspan=23, pady=0, padx=70)
         add_change_master_passwd_button_txt.set('Add/Change Master Password')
         # Website Entry Box Label
         self.website_entry_box_label = Label(text='Website', bg=MAIN_BG, font=MAIN_FONT, fg=MAIN_TEXT,
@@ -114,12 +109,10 @@ class UserInterface(Tk):
         self.email_username_entry_txt = StringVar()
         self.email_username_entry_box = Entry(textvariable=self.email_username_entry_txt, font=ENTRY_FONT, width=42,
                                               highlightthickness=0, bg=ENTRY_BOXES_BG, fg=ENTRY_BOXES_FG)
-        self.email_username_entry_box.grid(
-            sticky=W, row=8, column=1, rowspan=12, columnspan=23, ipady=3)
+        self.email_username_entry_box.grid(sticky=W, row=8, column=1, rowspan=12, columnspan=23, ipady=3)
         self.email_username_entry_box.bind('<Return>', self.get_login_details_bind)
         # Password Label
-        self.password_label = Label(text='Password', bg=MAIN_BG,
-                                    font=MAIN_FONT, fg=MAIN_TEXT, highlightthickness=0)
+        self.password_label = Label(text='Password', bg=MAIN_BG, font=MAIN_FONT, fg=MAIN_TEXT, highlightthickness=0)
         self.password_label.grid(sticky=E, row=9, column=0, rowspan=12, padx=25)
         # Password Entry Box
         self.password_entry_box_txt = StringVar()
@@ -135,8 +128,7 @@ class UserInterface(Tk):
                                                activebackground=BUTTON_ACTIVE_BG,
                                                fg=BUTTON_FG, activeforeground=BUTTON_ACTIVE_FG,
                                                command=self.generate_password)
-        self.generate_password_button.grid(
-            sticky=W, row=9, column=4, rowspan=12, columnspan=23, padx=67)
+        self.generate_password_button.grid(sticky=W, row=9, column=4, rowspan=12, columnspan=23, padx=67)
         self.generate_password_button_txt.set('Generate Password')
         # Add Button
         add_button_txt = StringVar()
@@ -206,11 +198,13 @@ class UserInterface(Tk):
             website_login = self.website_entry_box_txt.get()
             email_username = self.email_username_entry_txt.get()
             password_info = self.password_entry_box_txt.get()
-            self.login_info_to_file(website=website_login,
-                                    email_or_username=email_username, password=password_info)
-            self.website_entry_box_txt.set('')
-            self.email_username_entry_txt.set('')
-            self.password_entry_box_txt.set('')
+            if len(website_login) == 0 or len(email_username) == 0 or len(password_info) == 0:
+                messagebox.showinfo('Return', 'This field cannot be empty!')
+            else:
+                self.login_info_to_file(website=website_login, email_or_username=email_username, password=password_info)
+                self.website_entry_box_txt.set('')
+                self.email_username_entry_txt.set('')
+                self.password_entry_box_txt.set('')
 
     def open_password_notebook(self):
         if self.valid_or_not is True:
@@ -259,8 +253,7 @@ class UserInterface(Tk):
                                           'before you can proceed to change your master password.')
 
     def reset(self):
-        question_res = messagebox.askquestion(
-            'Erase data and master password?  Proceed????????????')
+        question_res = messagebox.askquestion('Erase data and master password?  Proceed????????????')
         if question_res == 'yes':
             if os.path.exists('logins_data.csv'):
                 os.remove('logins_data.csv')

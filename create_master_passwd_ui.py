@@ -1,11 +1,10 @@
-import os.path
 import tkinter.messagebox
 from tkinter import *
-
-import encrypting
 import get_hash
-import key_generation
 import mypass_ui
+import key_generation
+import os.path
+import encrypting
 
 MAIN_BG = '#05132b'
 MAIN_TEXT = '#2ce5e8'
@@ -55,14 +54,13 @@ class UserInterface(Tk):
         # Grid the widgets
         self.title_bar.grid(ipady=0, ipadx=0, column=0, row=0, rowspan=16, columnspan=23, sticky=N)
         self.close_button.grid(columnspan=23, padx=840, ipady=2, ipadx=7, column=2, row=0, sticky=E)
-        self.minimize_button.grid(columnspan=23, padx=810, ipady=2,
-                                  ipadx=7, column=1, row=0, sticky=E)
+        self.minimize_button.grid(columnspan=23, padx=810, ipady=2, ipadx=7, column=1, row=0, sticky=E)
         # Bind title bar motion to the move window function
         self.title_bar.bind('<B1-Motion>', self.move_window)
         # Canvas
         self.canvas = Canvas(width=500, height=330)
         self.canvas.grid(sticky=W, row=0, column=0, rowspan=16, columnspan=4, padx=0)
-        self.logo_img = PhotoImage(file='logo_custom.png')
+        self.logo_img = PhotoImage(file='C:/Users/argda/PycharmProjects/password-manager/logo_custom.png')
         self.canvas.create_image(300, 120, image=self.logo_img)
         self.canvas.config(bg=MAIN_BG, highlightthickness=0)
         # Welcome Label
@@ -71,14 +69,11 @@ class UserInterface(Tk):
                                    highlightthickness=0)
         self.welcome_label.place(x=230, y=290)
         # Password Label
-        self.password_label1 = Label(text='Create', bg=MAIN_BG,
-                                     font=MAIN_FONT, fg=MAIN_TEXT, highlightthickness=0)
+        self.password_label1 = Label(text='Create', bg=MAIN_BG, font=MAIN_FONT, fg=MAIN_TEXT, highlightthickness=0)
         self.password_label1.grid(sticky=E, row=6, column=0, rowspan=16, padx=25)
-        self.password_label2 = Label(text='Master', bg=MAIN_BG,
-                                     font=MAIN_FONT, fg=MAIN_TEXT, highlightthickness=0)
+        self.password_label2 = Label(text='Master', bg=MAIN_BG, font=MAIN_FONT, fg=MAIN_TEXT, highlightthickness=0)
         self.password_label2.grid(sticky=E, row=7, column=0, rowspan=16, padx=25)
-        self.password_label3 = Label(text='Password', bg=MAIN_BG,
-                                     font=MAIN_FONT, fg=MAIN_TEXT, highlightthickness=0)
+        self.password_label3 = Label(text='Password', bg=MAIN_BG, font=MAIN_FONT, fg=MAIN_TEXT, highlightthickness=0)
         self.password_label3.grid(sticky=E, row=8, column=0, rowspan=16, padx=25)
         # Password Entry Box
         self.password_entry_box_txt = StringVar()
@@ -86,8 +81,7 @@ class UserInterface(Tk):
                                         highlightthickness=0, bg=ENTRY_BOXES_BG, fg=ENTRY_BOXES_FG)
         self.password_entry_box.focus()
         self.password_entry_box.grid(sticky=W, row=6, column=1, rowspan=16, columnspan=23, ipady=3)
-        self.password_entry_box.bind(
-            '<Return>', self.add_or_change_master_password_button_click_bind)
+        self.password_entry_box.bind('<Return>', self.add_or_change_master_password_button_click_bind)
         # Show Info Label
         self.show_important_info_label1 = Label(text='Don\'t forget', bg=MAIN_BG, font=SUB_FONT, fg=IMPORTANT_FG,
                                                 highlightthickness=0)
@@ -141,21 +135,22 @@ class UserInterface(Tk):
         global new_get_hash
         if self.master_password_button_click is True:
             get_user_master_passwd = self.password_entry_box.get()
-            new_get_hash = get_hash.GetHash()
-            new_get_hash.let_us_hash_it(password=get_user_master_passwd)
-            new_key_gen = key_generation.KeyGen()
-            new_key_gen.automate_key_generation_using_password_and_salt(
-                user_password=get_user_master_passwd)
-            if new_get_hash.hash_it_has_it:
-                self.password_entry_box_txt.set('')
-                question_result = tkinter.messagebox.askquestion(
-                    'Do you want to return to the main application?')
-                if question_result == 'yes':
-                    self.destroy()
-                    mypass_ui.UserInterface()
-                else:
-                    self.destroy()
-                    UserInterface()
+            if len(get_user_master_passwd) == 0:
+                tkinter.messagebox.showinfo('Return', 'This field cannot be empty when save!')
+            else:
+                new_get_hash = get_hash.GetHash()
+                new_get_hash.let_us_hash_it(password=get_user_master_passwd)
+                new_key_gen = key_generation.KeyGen()
+                new_key_gen.automate_key_generation_using_password_and_salt(user_password=get_user_master_passwd)
+                if new_get_hash.hash_it_has_it:
+                    self.password_entry_box_txt.set('')
+                    question_result = tkinter.messagebox.askquestion('Do you want to return to the main application?')
+                    if question_result == 'yes':
+                        self.destroy()
+                        mypass_ui.UserInterface()
+                    else:
+                        self.destroy()
+                        UserInterface()
 
     def back_to_vpass_app_wins(self):
         self.destroy()

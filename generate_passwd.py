@@ -2,6 +2,7 @@ from tkinter import *
 import string
 import random as r
 import mypass_ui
+import pyperclip
 
 MAIN_BG = '#05132b'
 MAIN_TEXT = '#2ce5e8'
@@ -83,6 +84,7 @@ class GeneratePasswd(Tk):
         self.new_mypass_ui = mypass_ui.UserInterface()
         self.new_mypass_ui.new_password = self.hard_to_guess_gen_passwd
         self.new_mypass_ui.password_entry_box_txt.set(self.new_mypass_ui.new_password)
+        pyperclip.copy(self.hard_to_guess_gen_passwd)
 
 
 def main():
