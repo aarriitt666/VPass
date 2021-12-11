@@ -2,6 +2,7 @@ import os.path
 import tkinter.messagebox
 from tkinter import *
 
+import cryptography.fernet
 import encrypting
 import get_hash
 import key_generation
@@ -176,7 +177,15 @@ class UserInterface(Tk):
 
     def closing_app(self):
         if self.valid_or_not is True:
-            self.encryption_starting()
+            try:
+                self.encryption_starting()
+            except (cryptography.fernet.InvalidToken, TypeError):
+                with open('vpass_error_log.txt', mode='w') as f:
+                    custom_error_msg = 'In closing_app function of create_master_passwd_ui.py, an error raises about ' \
+                                       'Fernet InvalidToken when trying to encrypt using encryption_starting ' \
+                                       'function.  Also, TypeError may be raised if the content isn\'t a byte ' \
+                                       ' type.'
+                    f.write(custom_error_msg)
         self.destroy()
 
     def login_data_exist(self):
@@ -190,5 +199,16 @@ def main():
     mainloop()
 
 
+if __name__ == '__main__':
+    main()
+
+
+def main():
+    UserInterface()
+    mainloop()
+
+
+if __name__ == '__main__':
+    main()
 if __name__ == '__main__':
     main()

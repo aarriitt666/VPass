@@ -1,10 +1,13 @@
 import csv
 import os.path
+import random as r
+import string
 from csv import *
 from tkinter import *
 from tkinter import messagebox
 
 import create_master_passwd_ui
+import cryptography.fernet
 import encrypting
 import generate_passwd
 import get_hash
@@ -187,12 +190,16 @@ class UserInterface(Tk):
     def login_info_to_file(self, website, email_or_username, password):
         self.new_website = website
         self.new_email_or_username = email_or_username
-        self.new_password = password
+        new_password = [i.replace(',', r.choice(string.punctuation)) for i in str(password)]
+        temp_p = ''.join(new_password)
+        new_password1 = [i.replace('"', r.choice(string.punctuation)) for i in str(temp_p)]
+        self.new_password = ''.join(new_password1)
         row = [self.new_website, self.new_email_or_username, self.new_password]
+        new_row = [i.strip(' "\t\r\n') for i in row]
         with open('logins_data.csv', mode='a', newline='',
                   encoding='utf-8') as f:
             append = writer(f, delimiter=',', escapechar=' ', quoting=csv.QUOTE_NONE)
-            append.writerow(row)
+            append.writerow(new_row)
 
     def get_login_details_bind(self, event):
         self.get_login_details()
@@ -242,9 +249,21 @@ class UserInterface(Tk):
         valid_or_not = new_get_hash.check_hash(password=master_passwd)
         self.valid_or_not = valid_or_not
         if self.valid_or_not:
-            self.decryption_starting()
-            self.master_passwd_entry_box_txt.set('')
-            messagebox.showinfo('Return', 'You have successfully enter a master password!')
+            try:
+                self.decryption_starting()
+            except (cryptography.fernet.InvalidToken, TypeError):
+                with open('vpass_error_log.txt', mode='w') as f:
+                    custom_error_msg = 'In check_master_password function of mypass_ui.py, an error raises about ' \
+                                       'Fernet InvalidToken when trying to decrypt using decryption_starting ' \
+                                       'function.  Also, TypeError may be raised if the content isn\'t a byte ' \
+                                       ' type.'
+                    f.write(custom_error_msg)
+                self.master_passwd_entry_box_txt.set('')
+                self.destroy()
+                UserInterface()
+            else:
+                self.master_passwd_entry_box_txt.set('')
+                messagebox.showinfo('Return', 'You have successfully enter a master password!')
         else:
             messagebox.showinfo('Return',
                                 'Incorrect master password, without valid master password, your encrypted '
@@ -291,7 +310,15 @@ class UserInterface(Tk):
 
     def closing_app(self):
         if self.valid_or_not is True:
-            self.encryption_starting()
+            try:
+                self.encryption_starting()
+            except (cryptography.fernet.InvalidToken, TypeError):
+                with open('vpass_error_log.txt', mode='w') as f:
+                    custom_error_msg = 'In closing_app function of mypass_ui.py, an error raises about ' \
+                                       'Fernet InvalidToken when trying to encrypt using encryption_starting ' \
+                                       'function.  Also, TypeError may be raised if the content isn\'t a byte ' \
+                                       ' type.'
+                    f.write(custom_error_msg)
         self.destroy()
 
     def login_data_exist(self):

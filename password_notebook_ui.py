@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import messagebox
 
 import create_master_passwd_ui
+import cryptography.fernet
 import encrypting
 import mypass_ui
 import pandas as pd
@@ -177,15 +178,11 @@ class PasswordNotebook(Tk):
             new_result = result.replace(',', ' | ')
             self.info_box.delete('1.0', END)
             self.info_box.insert('1.0',
-                                 'Known bugs for editing logins:  1) Double quotes in password can create issues such'
-                                 ' as unwanted double quotes could get multiply in the password string. 2) Trying to '
-                                 'edit a login but trying to generate password more than once results in logins info '
-                                 'return as None or empty in the entry fields.\n'
+                                 'Please make sure to not use any comma or double quotation mark in password because '
+                                 'this application isn\'t built to handle password that got double quotation marks and '
+                                 'commas. '
                                  'New feature added:  1) Whenever you use automated generate password feature, you can'
                                  ' just do Ctrl+V keys to paste the password into a website.\n'
-                                 'Please report more bugs to me at my email address or call me up.  Only people who '
-                                 'know me personally can do this.  If you don\'t know me personally, '
-                                 'you might have to wait for me to discover more bugs on my own and fix \'em bugs.\n'
                                  '-- Note from Vinh Nguyen.\n')
             self.info_box.insert(
                 END, '-------------------------------------------------------------------------\n')
@@ -261,7 +258,15 @@ class PasswordNotebook(Tk):
 
     def closing_app(self):
         if self.valid_or_not:
-            self.encryption_starting()
+            try:
+                self.encryption_starting()
+            except (cryptography.fernet.InvalidToken, TypeError):
+                with open('vpass_error_log.txt', mode='w') as f:
+                    custom_error_msg = 'In closing_app function of password_notebook_ui.py, an error raises about ' \
+                                       'Fernet InvalidToken when trying to encrypt using encryption_starting ' \
+                                       'function.  Also, TypeError may be raised if the content isn\'t a byte ' \
+                                       ' type.'
+                    f.write(custom_error_msg)
         self.destroy()
 
     def login_data_exist(self):

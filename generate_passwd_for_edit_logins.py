@@ -80,7 +80,9 @@ class GeneratePasswd(Tk):
         passwd_length = self.slider1.get()
         characters = string.ascii_letters + string.digits + string.punctuation
         temp = ''.join(r.choice(characters) for i in range(passwd_length))
-        self.hard_to_guess_gen_passwd = temp.strip(' "\'\t\r\n')
+        new_temp = temp.strip(' "\'\t\r\n')
+        new_temp1 = new_temp.replace('"', '')
+        self.hard_to_guess_gen_passwd = new_temp1.replace(',', '')
         return self.hard_to_guess_gen_passwd
 
     def reopen_edit_logins(self):

@@ -1,3 +1,5 @@
+import cryptography.fernet
+
 from mypass_ui import UserInterface
 import encrypting
 
@@ -23,7 +25,15 @@ def main():
     except Exception:
         print('Error: another unknown error occurred.')
         if valid_or_not:
-            encryption_starting()
+            try:
+                encryption_starting()
+            except (cryptography.fernet.InvalidToken, TypeError):
+                with open('vpass_error_log.txt', mode='w') as f:
+                    custom_error_msg = 'In main() function of main.py, an error raises about ' \
+                                       'Fernet InvalidToken when trying to encrypt using encryption_starting ' \
+                                       'function.  Also, TypeError may be raised if the content isn\'t a byte ' \
+                                       ' type.'
+                    f.write(custom_error_msg)
 
 
 if __name__ == '__main__':

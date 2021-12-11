@@ -27,9 +27,6 @@ class Encrypting:
             f_key = new_keygen.read_key()
             file_full_path = 'logins_data.csv'
             if os.path.exists(file_full_path):
-                # Here we should write code to sanitize path of file and check validity.
-                # Short of time, I couldn't put the
-                # effort to do just this.  This will have to be done at another time.
                 with open(file_full_path, mode='r') as encrypt_a_file:
                     file_content = encrypt_a_file.read()
                 encoded_file = file_content.encode()
