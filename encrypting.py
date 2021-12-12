@@ -16,7 +16,7 @@ class Encrypting:
         self.f_key = f_key
         self.done_encrypting = done_encrypting
 
-    def encrypting(self, passwd_validity):
+    def encrypting(self, passwd_validity, file_path):
         global f_key
         global new_keygen
         global master_password_is_valid
@@ -25,7 +25,7 @@ class Encrypting:
         if master_password_is_valid:
             new_keygen = KeyGen()
             f_key = new_keygen.read_key()
-            file_full_path = 'logins_data.csv'
+            file_full_path = file_path
             if os.path.exists(file_full_path):
                 with open(file_full_path, mode='r') as encrypt_a_file:
                     file_content = encrypt_a_file.read()
@@ -39,7 +39,7 @@ class Encrypting:
                 done_encrypting = True
             return self.done_encrypting
 
-    def decrypting(self, passwd_validity):
+    def decrypting(self, passwd_validity, file_path):
         global f_key
         global new_keygen
         global master_password_is_valid
@@ -48,7 +48,7 @@ class Encrypting:
         if master_password_is_valid:
             new_keygen = KeyGen()
             f_key = new_keygen.read_key()
-            file_full_path = 'logins_data.csv'
+            file_full_path = file_path
             if os.path.exists(file_full_path):
                 encrypted_file_path = file_full_path
                 with open(encrypted_file_path, mode='rb') as read_encrypted_file:

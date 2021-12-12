@@ -168,19 +168,23 @@ class UserInterface(Tk):
     def encryption_starting(self):
         new_encrypting = encrypting.Encrypting()
         new_valid_or_not = self.valid_or_not
-        new_encrypting.encrypting(passwd_validity=new_valid_or_not)
+        new_encrypting.encrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
+        new_encrypting.encrypting(passwd_validity=new_valid_or_not,
+                                  file_path='logins_data_json.json')
 
     def decryption_starting(self):
         new_decrypting = encrypting.Encrypting()
         new_valid_or_not = self.valid_or_not
-        new_decrypting.decrypting(passwd_validity=new_valid_or_not)
+        new_decrypting.decrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
+        new_decrypting.decrypting(passwd_validity=new_valid_or_not,
+                                  file_path='logins_data_json.json')
 
     def closing_app(self):
         if self.valid_or_not is True:
             try:
                 self.encryption_starting()
             except (cryptography.fernet.InvalidToken, TypeError):
-                with open('vpass_error_log.txt', mode='w') as f:
+                with open('vpass_error_log.txt', mode='a') as f:
                     custom_error_msg = 'In closing_app function of create_master_passwd_ui.py, an error raises about ' \
                                        'Fernet InvalidToken when trying to encrypt using encryption_starting ' \
                                        'function.  Also, TypeError may be raised if the content isn\'t a byte ' \
@@ -208,7 +212,5 @@ def main():
     mainloop()
 
 
-if __name__ == '__main__':
-    main()
 if __name__ == '__main__':
     main()

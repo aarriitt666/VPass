@@ -1,3 +1,4 @@
+import json
 import os.path
 from tkinter import *
 from tkinter import messagebox
@@ -15,6 +16,7 @@ MAIN_FONT = ('Courier', 14, 'normal')
 ENTRY_FONT = ('Courier', 14, 'italic')
 BUTTON_FONT = ('Courier', 12, 'bold')
 BUTTON_FONT2 = ('Courier', 11, 'bold')
+BUTTON_FONT3 = ('Courier', 10, 'bold')
 ENTRY_BOXES_BG = '#05132b'
 ENTRY_BOXES_FG = '#999395'
 BUTTON_FG = '#ebeb0e'
@@ -43,6 +45,7 @@ class PasswordNotebook(Tk):
         self.sb = None
         self.logins = None
         self.selected_login = None
+        self.s_query = None
         self.new_create_master_passwd_ui = None
         # Removing default title bar and default geometry
         self.overrideredirect(True)  # turns off title bar, geometry
@@ -136,6 +139,24 @@ class PasswordNotebook(Tk):
         # self.sb.grid(sticky=NS, row=3, column=2, rowspan=4)
         # self.info_box.config(yscrollcommand=self.sb.set)
         # self.sb.config(command=self.info_box.yview)
+
+        # Search entry box
+        self.search_box_txt = StringVar()
+        self.search_box = Entry(textvariable=self.search_box_txt, width=20, font=ENTRY_FONT, bg=MAIN_TEXT_BG,
+                                highlightbackground=MAIN_HL_BG,
+                                fg=ENTRY_BOXES_FG)
+        self.search_box.place(x=200, y=60)
+        self.search_box.insert(0, 'Search')
+        self.s_search_clicked = self.search_box.bind('<Button-1>', self.search_click_bind)
+        self.search_box.bind('<Return>', self.search_return_bind)
+
+        # Search Button
+        self.search_bttn_txt = StringVar()
+        self.search_bttn = Button(textvariable=self.search_bttn_txt, width=10, bg=BUTTON_BG, fg=BUTTON_FG,
+                                  font=BUTTON_FONT3, activebackground=BUTTON_ACTIVE_BG,
+                                  activeforeground=BUTTON_ACTIVE_FG, command=self.search)
+        self.search_bttn.place(x=430, y=60)
+        self.search_bttn_txt.set('Search')
 
     def move_window(self, event):
         self.geometry('+{0}+{1}'.format(event.x_root, event.y_root))
@@ -249,19 +270,23 @@ class PasswordNotebook(Tk):
     def encryption_starting(self):
         new_encrypting = encrypting.Encrypting()
         new_valid_or_not = self.valid_or_not
-        new_encrypting.encrypting(passwd_validity=new_valid_or_not)
+        new_encrypting.encrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
+        new_encrypting.encrypting(passwd_validity=new_valid_or_not,
+                                  file_path='logins_data_json.json')
 
     def decryption_starting(self):
         new_decrypting = encrypting.Encrypting()
         new_valid_or_not = self.valid_or_not
-        new_decrypting.decrypting(passwd_validity=new_valid_or_not)
+        new_decrypting.decrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
+        new_decrypting.decrypting(passwd_validity=new_valid_or_not,
+                                  file_path='logins_data_json.json')
 
     def closing_app(self):
         if self.valid_or_not:
             try:
                 self.encryption_starting()
             except (cryptography.fernet.InvalidToken, TypeError):
-                with open('vpass_error_log.txt', mode='w') as f:
+                with open('vpass_error_log.txt', mode='a') as f:
                     custom_error_msg = 'In closing_app function of password_notebook_ui.py, an error raises about ' \
                                        'Fernet InvalidToken when trying to encrypt using encryption_starting ' \
                                        'function.  Also, TypeError may be raised if the content isn\'t a byte ' \
@@ -284,6 +309,32 @@ class PasswordNotebook(Tk):
             messagebox.showinfo('Return', 'You need to enter a correct master password in the main application '
                                           'before you can proceed to change your master password.')
 
+    def search(self):
+        self.s_query = self.search_box.get()
+        with open('logins_data_json.json', mode='r') as f:
+            search_data = json.load(f)
+            if self.s_query in search_data:
+                s_login = search_data[self.s_query]
+                strip_s_login = str(s_login).replace(
+                    '{\'email_or_username\':', 'Email or Username:')
+                temp1 = strip_s_login.replace(': \'', ': ')
+                temp2 = temp1.replace('\\r\\n\',', ',')
+                temp3 = temp2.replace('\'password\':', 'Password:')
+                temp4 = temp3.replace(', Password:', ' | Password:')
+                temp5 = temp4.replace('.com\' |', '.com | ')
+                temp6 = temp5[0: -2]
+                temp7 = f'Website: {self.s_query} | {temp6}'
+                self.info_box.delete('1.0', END)
+                self.info_box.insert('1.0', temp7)
+
+    def search_click_bind(self, event):
+        self.search_box.config(state=NORMAL)
+        self.search_box.delete(0, END)
+        self.search_box.unbind('<Button-1>', self.s_search_clicked)
+
+    def search_return_bind(self, event):
+        self.search()
+
 
 def main():
     PasswordNotebook()
@@ -292,7 +343,9 @@ def main():
 
 if __name__ == '__main__':
     main()
-                                          'before you can proceed to change your master password.')
+
+    def search_return_bind(self, event):
+        self.search()
 
 
 def main():

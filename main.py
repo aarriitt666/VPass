@@ -1,7 +1,6 @@
 import cryptography.fernet
-
-from mypass_ui import UserInterface
 import encrypting
+from mypass_ui import UserInterface
 
 valid_or_not = False
 
@@ -9,7 +8,8 @@ valid_or_not = False
 def encryption_starting():
     new_encrypting = encrypting.Encrypting()
     new_valid_or_not = valid_or_not
-    new_encrypting.encrypting(passwd_validity=new_valid_or_not)
+    new_encrypting.encrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
+    new_encrypting.encrypting(passwd_validity=new_valid_or_not, file_path='logins_data_json.json')
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
             try:
                 encryption_starting()
             except (cryptography.fernet.InvalidToken, TypeError):
-                with open('vpass_error_log.txt', mode='w') as f:
+                with open('vpass_error_log.txt', mode='a') as f:
                     custom_error_msg = 'In main() function of main.py, an error raises about ' \
                                        'Fernet InvalidToken when trying to encrypt using encryption_starting ' \
                                        'function.  Also, TypeError may be raised if the content isn\'t a byte ' \

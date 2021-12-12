@@ -1,4 +1,5 @@
 import csv
+import json
 import os.path
 import random as r
 import string
@@ -31,6 +32,7 @@ new_selected_login = None
 new_condition = None
 gen_passwd_boolean_val = False
 valid_or_not = False
+json_new_data = None
 
 
 class EditLoginsUi(Tk):
@@ -52,6 +54,11 @@ class EditLoginsUi(Tk):
         self.new_selected_login = new_selected_login
         self.gen_passwd_boolean_val = gen_passwd_boolean_val
         self.new_master_passwd_ui = None
+        self.w = None
+        self.eu = None
+        self.pw = None
+        self.data = None
+        self.new_data = json_new_data
         # Removing default title bar and default geometry
         self.overrideredirect(True)  # turns off title bar, geometry
         self.geometry('870x500+150+75')  # set new geometry
@@ -218,6 +225,33 @@ class EditLoginsUi(Tk):
             self.email_username_entry_txt.set('')
             self.password_entry_box_txt.set('')
 
+    def login_info_to_file_json(self, website, email_or_username, password):
+        global json_new_data
+        self.w = website
+        self.eu = email_or_username
+        new_password = [i.replace(',', r.choice(string.punctuation)) for i in str(password)]
+        temp_p = ''.join(new_password)
+        new_password1 = [i.replace('"', r.choice(string.punctuation)) for i in str(temp_p)]
+        temp_p1 = ''.join(new_password1)
+        self.pw = temp_p1.strip(' "\t\r\n')
+        json_new_data = {
+            self.w: {
+                'email_or_username': self.eu,
+                'password': self.pw
+            }
+        }
+
+        print(json_new_data)
+        try:
+            with open('logins_data_json.json', mode='r') as f:
+                self.data = json.load(f)
+                self.data.update(json_new_data)
+            with open('logins_data_json.json', mode='w') as f:
+                json.dump(self.data, f, indent=4)
+        except FileNotFoundError:
+            with open('logins_data_json.json', mode='w') as f:
+                json.dump(json_new_data, f, indent=4)
+
     def login_info_to_file(self, website, email_or_username, password):
         self.new_website = website
         self.new_email_or_username = email_or_username
@@ -242,6 +276,8 @@ class EditLoginsUi(Tk):
         else:
             self.login_info_to_file(website=website_login,
                                     email_or_username=email_username, password=password_info)
+            self.login_info_to_file_json(website=website_login, email_or_username=email_username,
+                                         password=password_info)
             self.website_entry_box_txt.set('')
             self.email_username_entry_txt.set('')
             self.password_entry_box_txt.set('')
@@ -262,19 +298,23 @@ class EditLoginsUi(Tk):
     def encryption_starting(self):
         new_encrypting = encrypting.Encrypting()
         new_valid_or_not = self.valid_or_not
-        new_encrypting.encrypting(passwd_validity=new_valid_or_not)
+        new_encrypting.encrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
+        new_encrypting.encrypting(passwd_validity=new_valid_or_not,
+                                  file_path='logins_data_json.json')
 
     def decryption_starting(self):
         new_decrypting = encrypting.Encrypting()
         new_valid_or_not = self.valid_or_not
-        new_decrypting.decrypting(passwd_validity=new_valid_or_not)
+        new_decrypting.decrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
+        new_decrypting.decrypting(passwd_validity=new_valid_or_not,
+                                  file_path='logins_data_json.json')
 
     def closing_app(self):
         if self.valid_or_not is True:
             try:
                 self.encryption_starting()
             except (cryptography.fernet.InvalidToken, TypeError):
-                with open('vpass_error_log.txt', mode='w') as f:
+                with open('vpass_error_log.txt', mode='a') as f:
                     custom_error_msg = 'In closing_app function of edit_logins.py, an error raises about ' \
                                        'Fernet InvalidToken when trying to encrypt using encryption_starting ' \
                                        'function.  Also, TypeError may be raised if the content isn\'t a byte ' \
@@ -299,6 +339,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+    return self.logins_data_existed
 
     def open_master_password_ui(self):
         self.destroy()

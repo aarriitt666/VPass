@@ -1,4 +1,5 @@
 import csv
+import json
 import os.path
 import random as r
 import string
@@ -28,6 +29,7 @@ BUTTON_ACTIVE_FG = '#d1d0c9'
 MAIN_HL_BG = '#5c350b'
 
 valid_or_not = False
+json_new_data = None
 
 
 class UserInterface(Tk):
@@ -46,6 +48,11 @@ class UserInterface(Tk):
         self.new_passwd = None
         self.new_create_master_passwd_ui = None
         self.reset_val = False
+        self.w = None
+        self.eu = None
+        self.pw = None
+        self.data = None
+        self.new_data = json_new_data
         # Removing default title bar and default geometry
         self.overrideredirect(True)  # turns off title bar, geometry
         self.geometry('870x500+150+75')  # set new geometry
@@ -187,6 +194,32 @@ class UserInterface(Tk):
     def screen_appear(self, event):
         self.overrideredirect(True)
 
+    def login_info_to_file_json(self, website, email_or_username, password):
+        global json_new_data
+        self.w = website
+        self.eu = email_or_username
+        new_password = [i.replace(',', r.choice(string.punctuation)) for i in str(password)]
+        temp_p = ''.join(new_password)
+        new_password1 = [i.replace('"', r.choice(string.punctuation)) for i in str(temp_p)]
+        temp_p1 = ''.join(new_password1)
+        self.pw = temp_p1.strip(' "\t\r\n')
+        json_new_data = {
+            self.w: {
+                'email_or_username': self.eu,
+                'password': self.pw
+            }
+        }
+
+        try:
+            with open('logins_data_json.json', mode='r') as f:
+                self.data = json.load(f)
+                self.data.update(json_new_data)
+            with open('logins_data_json.json', mode='w') as f:
+                json.dump(self.data, f, indent=4)
+        except FileNotFoundError:
+            with open('logins_data_json.json', mode='w') as f:
+                json.dump(json_new_data, f, indent=4)
+
     def login_info_to_file(self, website, email_or_username, password):
         self.new_website = website
         self.new_email_or_username = email_or_username
@@ -218,6 +251,8 @@ class UserInterface(Tk):
             else:
                 self.login_info_to_file(website=website_login,
                                         email_or_username=email_username, password=password_info)
+                self.login_info_to_file_json(website=website_login, email_or_username=email_username,
+                                             password=password_info)
                 self.website_entry_box_txt.set('')
                 self.email_username_entry_txt.set('')
                 self.password_entry_box_txt.set('')
@@ -252,7 +287,7 @@ class UserInterface(Tk):
             try:
                 self.decryption_starting()
             except (cryptography.fernet.InvalidToken, TypeError):
-                with open('vpass_error_log.txt', mode='w') as f:
+                with open('vpass_error_log.txt', mode='a') as f:
                     custom_error_msg = 'In check_master_password function of mypass_ui.py, an error raises about ' \
                                        'Fernet InvalidToken when trying to decrypt using decryption_starting ' \
                                        'function.  Also, TypeError may be raised if the content isn\'t a byte ' \
@@ -290,6 +325,10 @@ class UserInterface(Tk):
                 os.remove('b_file_hash.txt')
             if os.path.exists('f_file_key.key'):
                 os.remove('f_file_key.key')
+            if os.path.exists('vpass_error_log.txt'):
+                os.remove('vpass_error_log.txt')
+            if os.path.exists('logins_data_json.json'):
+                os.remove('logins_data_json.json')
             self.reset_val = True
             self.destroy()
             UserInterface()
@@ -301,19 +340,23 @@ class UserInterface(Tk):
     def encryption_starting(self):
         new_encrypting = encrypting.Encrypting()
         new_valid_or_not = self.valid_or_not
-        new_encrypting.encrypting(passwd_validity=new_valid_or_not)
+        new_encrypting.encrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
+        new_encrypting.encrypting(passwd_validity=new_valid_or_not,
+                                  file_path='logins_data_json.json')
 
     def decryption_starting(self):
         new_decrypting = encrypting.Encrypting()
         new_valid_or_not = self.valid_or_not
-        new_decrypting.decrypting(passwd_validity=new_valid_or_not)
+        new_decrypting.decrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
+        new_decrypting.decrypting(passwd_validity=new_valid_or_not,
+                                  file_path='logins_data_json.json')
 
     def closing_app(self):
         if self.valid_or_not is True:
             try:
                 self.encryption_starting()
             except (cryptography.fernet.InvalidToken, TypeError):
-                with open('vpass_error_log.txt', mode='w') as f:
+                with open('vpass_error_log.txt', mode='a') as f:
                     custom_error_msg = 'In closing_app function of mypass_ui.py, an error raises about ' \
                                        'Fernet InvalidToken when trying to encrypt using encryption_starting ' \
                                        'function.  Also, TypeError may be raised if the content isn\'t a byte ' \
@@ -334,6 +377,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+    self.logins_data_existed = True
+    return self.logins_data_existed
 
 
 def main():
