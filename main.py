@@ -1,6 +1,7 @@
 import cryptography.fernet
-import encrypting
+
 from mypass_ui import UserInterface
+import encrypting
 
 valid_or_not = False
 
