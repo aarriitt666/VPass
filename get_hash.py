@@ -29,12 +29,16 @@ class GetHash:
 
     def check_hash(self, password):
         passwd = password.encode()
-        with open('b_file_hash.txt', mode='rb') as open_hash_file:
-            self.hash_done = open_hash_file.read()
-        if b.checkpw(passwd, self.hash_done):
-            return True
+        try:
+            with open('b_file_hash.txt', mode='rb') as open_hash_file:
+                self.hash_done = open_hash_file.read()
+        except FileNotFoundError:
+            pass
         else:
-            return False
+            if b.checkpw(passwd, self.hash_done):
+                return True
+            else:
+                return False
 
     def main(self):
         prog_runs = True

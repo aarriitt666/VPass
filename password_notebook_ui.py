@@ -146,7 +146,7 @@ class PasswordNotebook(Tk):
                                 highlightbackground=MAIN_HL_BG,
                                 fg=ENTRY_BOXES_FG)
         self.search_box.place(x=200, y=60)
-        self.search_box.insert(0, 'Search')
+        self.search_box.insert(0, 'Website or Login')
         self.s_search_clicked = self.search_box.bind('<Button-1>', self.search_click_bind)
         self.search_box.bind('<Return>', self.search_return_bind)
 
@@ -215,8 +215,11 @@ class PasswordNotebook(Tk):
 
     def list_logins_used(self, event):
         # Gets current selection from list_logins
-        self.selected_login = self.list_logins.get(self.list_logins.curselection())
-        self.display_login_value()
+        try:
+            self.selected_login = self.list_logins.get(self.list_logins.curselection())
+            self.display_login_value()
+        except Exception:
+            pass
 
     def edit_logins(self):
         msgbox = messagebox.askquestion(title='Edit Logins Confirmation',
@@ -327,27 +330,18 @@ class PasswordNotebook(Tk):
                 temp4 = temp3.replace(', Password:', ' | Password:')
                 temp5 = temp4.replace('.com\' |', '.com | ')
                 temp6 = temp5[0: -2]
-                temp7 = f'Website: {self.s_query} | {temp6}'
+                temp7 = temp6.replace('"', '')
+                temp8 = f'Website: {self.s_query} | {temp7}'
                 self.info_box.delete('1.0', END)
-                self.info_box.insert('1.0', temp7)
+                self.info_box.insert('1.0', temp8)
+            else:
+                messagebox.showinfo('Return',
+                                    'What you\'re searching isn\'t there.\nJust a reminder, search is case sensitive.')
 
     def search_click_bind(self, event):
         self.search_box.config(state=NORMAL)
         self.search_box.delete(0, END)
         self.search_box.unbind('<Button-1>', self.s_search_clicked)
-
-    def search_return_bind(self, event):
-        self.search()
-
-
-def main():
-    PasswordNotebook()
-    mainloop()
-
-
-if __name__ == '__main__':
-    main()
-    self.search_box.unbind('<Button-1>', self.s_search_clicked)
 
     def search_return_bind(self, event):
         self.search()
