@@ -3,12 +3,12 @@ import os.path
 from tkinter import *
 from tkinter import messagebox
 
+import create_master_passwd_ui
 import cryptography.fernet
+import encrypting
+import mypass_ui
 import pandas as pd
 from edit_logins import EditLoginsUi
-import mypass_ui
-import encrypting
-import create_master_passwd_ui
 
 MAIN_BG = '#05132b'
 MAIN_TEXT = '#2ce5e8'
@@ -63,8 +63,10 @@ class PasswordNotebook(Tk):
                                       highlightbackground=MAIN_HL_BG)
         # Grid the widgets
         self.title_bar.grid(ipady=2, ipadx=800, column=0, row=0, columnspan=2, sticky=N)
-        self.close_button.grid(columnspan=2, rowspan=4, padx=1170, ipady=2, ipadx=7, column=2, row=0, sticky=E)
-        self.minimize_button.grid(columnspan=2, rowspan=4, padx=1140, ipady=2, ipadx=7, column=1, row=0, sticky=E)
+        self.close_button.grid(columnspan=2, rowspan=4, padx=1170,
+                               ipady=2, ipadx=7, column=2, row=0, sticky=E)
+        self.minimize_button.grid(columnspan=2, rowspan=4, padx=1140,
+                                  ipady=2, ipadx=7, column=1, row=0, sticky=E)
         # Bind title bar motion to the move window function
         self.title_bar.bind('<B1-Motion>', self.move_window)
         # Left Frame
@@ -73,7 +75,7 @@ class PasswordNotebook(Tk):
         # Canvas
         self.canvas = Canvas(self.left_frame, width=360, height=60)
         self.canvas.grid(row=1, column=0, sticky=W)
-        self.logo_img = PhotoImage(file='C:/Users/argda/PycharmProjects/password-manager/logo_custom_small.png')
+        self.logo_img = PhotoImage(file='logo_custom_small.png')
         self.canvas.create_image(25, 25, image=self.logo_img)
         self.canvas.config(bg=MAIN_BG, highlightthickness=0)
         # Canvas
@@ -119,7 +121,8 @@ class PasswordNotebook(Tk):
                                    highlightbackground=MAIN_HL_BG, highlightthickness=1,
                                    bd=0, fg=ENTRY_BOXES_FG, font=ENTRY_FONT, selectforeground=LIST_BOX_SELECT_FG,
                                    selectbackground=LIST_BOX_SELECT_BG, selectmode=SINGLE)
-        self.list_logins.grid(rowspan=4, columnspan=2, row=3, column=0, padx=2, pady=2, ipadx=10, sticky=W)
+        self.list_logins.grid(rowspan=4, columnspan=2, row=3, column=0,
+                              padx=2, pady=2, ipadx=10, sticky=W)
         # Calling display_logins_only function to get the list of logins
         logins_list = self.display_logins_only()
         if logins_list is not None:
@@ -171,23 +174,27 @@ class PasswordNotebook(Tk):
 
     def read_login_details(self):
         if os.path.exists('logins_data.csv'):
-            new_data = pd.read_csv('logins_data.csv', names=['Logins', 'Email or Username', 'Password'])
+            new_data = pd.read_csv('logins_data.csv', names=[
+                                   'Logins', 'Email or Username', 'Password'])
             self.login_details_df = pd.DataFrame(new_data)
             return self.login_details_df
 
     def display_logins_only(self):
         if os.path.exists('logins_data.csv'):
-            new_data = pd.read_csv('logins_data.csv', names=['Logins', 'Email or Username', 'Password'])
+            new_data = pd.read_csv('logins_data.csv', names=[
+                                   'Logins', 'Email or Username', 'Password'])
             self.logins = new_data.Logins.to_list()
             return self.logins
 
     def display_login_value(self):
         if os.path.exists('logins_data.csv'):
-            new_data = pd.read_csv('logins_data.csv', names=['Logins', 'Email or Username', 'Password'])
+            new_data = pd.read_csv('logins_data.csv', names=[
+                                   'Logins', 'Email or Username', 'Password'])
             df = pd.DataFrame(new_data)
             new_df = df[df.Logins == self.selected_login]
             set_index_column = new_df.set_index('Logins')
-            new_df = set_index_column.rename(columns={'Logins': '', 'Email or Username': '', 'Password': ''})
+            new_df = set_index_column.rename(
+                columns={'Logins': '', 'Email or Username': '', 'Password': ''})
             result = new_df.to_csv(header=False)
             new_result = result.replace(',', ' | ')
             self.info_box.delete('1.0', END)
@@ -198,10 +205,12 @@ class PasswordNotebook(Tk):
                                  'New feature added:  1) Whenever you use automated generate password feature, you can'
                                  ' just do Ctrl+V keys to paste the password into a website.\n'
                                  '-- Note from Vinh Nguyen.\n')
-            self.info_box.insert(END, '-------------------------------------------------------------------------\n')
+            self.info_box.insert(
+                END, '-------------------------------------------------------------------------\n')
             self.info_box.insert(END,
                                  'Logins' + ' ' + '-' + ' ' + 'Email/Username' + ' ' + '-' + ' ' + 'Password' + '\n')
-            self.info_box.insert(END, '-------------------------------------------------------------------------')
+            self.info_box.insert(
+                END, '-------------------------------------------------------------------------')
             self.info_box.insert(END, '\n' + new_result)
 
     def list_logins_used(self, event):
@@ -221,7 +230,8 @@ class PasswordNotebook(Tk):
                 new_edit_logins.valid_or_not = self.valid_or_not
                 # Reading in data from stored logins data file using Pandas
                 if os.path.exists('logins_data.csv'):
-                    new_data = pd.read_csv('logins_data.csv', names=['Logins', 'Email or Username', 'Password'])
+                    new_data = pd.read_csv('logins_data.csv', names=[
+                                           'Logins', 'Email or Username', 'Password'])
                     # Move data into DataFrame for easy manipulation
                     df = pd.DataFrame(new_data)
                     # Get a selected row of data
@@ -261,13 +271,15 @@ class PasswordNotebook(Tk):
         new_encrypting = encrypting.Encrypting()
         new_valid_or_not = self.valid_or_not
         new_encrypting.encrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
-        new_encrypting.encrypting(passwd_validity=new_valid_or_not, file_path='logins_data_json.json')
+        new_encrypting.encrypting(passwd_validity=new_valid_or_not,
+                                  file_path='logins_data_json.json')
 
     def decryption_starting(self):
         new_decrypting = encrypting.Encrypting()
         new_valid_or_not = self.valid_or_not
         new_decrypting.decrypting(passwd_validity=new_valid_or_not, file_path='logins_data.csv')
-        new_decrypting.decrypting(passwd_validity=new_valid_or_not, file_path='logins_data_json.json')
+        new_decrypting.decrypting(passwd_validity=new_valid_or_not,
+                                  file_path='logins_data_json.json')
 
     def closing_app(self):
         if self.valid_or_not:
@@ -307,7 +319,8 @@ class PasswordNotebook(Tk):
         else:
             if self.s_query in search_data:
                 s_login = search_data[self.s_query]
-                strip_s_login = str(s_login).replace('{\'email_or_username\':', 'Email or Username:')
+                strip_s_login = str(s_login).replace(
+                    '{\'email_or_username\':', 'Email or Username:')
                 temp1 = strip_s_login.replace(': \'', ': ')
                 temp2 = temp1.replace('\\r\\n\',', ',')
                 temp3 = temp2.replace('\'password\':', 'Password:')
@@ -322,6 +335,19 @@ class PasswordNotebook(Tk):
         self.search_box.config(state=NORMAL)
         self.search_box.delete(0, END)
         self.search_box.unbind('<Button-1>', self.s_search_clicked)
+
+    def search_return_bind(self, event):
+        self.search()
+
+
+def main():
+    PasswordNotebook()
+    mainloop()
+
+
+if __name__ == '__main__':
+    main()
+    self.search_box.unbind('<Button-1>', self.s_search_clicked)
 
     def search_return_bind(self, event):
         self.search()
